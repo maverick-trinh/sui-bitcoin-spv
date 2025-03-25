@@ -6,7 +6,7 @@ use bitcoin_spv::merkle_tree::verify_merkle_proof;
 use bitcoin_spv::btc_math::target_to_bits;
 use bitcoin_spv::utils::nth_element;
 use bitcoin_spv::transaction::make_transaction;
-use bitcoin_spv::params::{Params, Self};
+use bitcoin_spv::params::{Params, Self, is_correct_init_height};
 
 
 use sui::dynamic_field as df;
@@ -27,6 +27,8 @@ const EBlockNotFound: vector<u8> = b"The specified block could not be found in t
 const EForkChainWorkTooSmall: vector<u8> = b"The proposed fork has less work than the current chain";
 #[error]
 const ETxNotInBlock: vector<u8> = b"The transaction is not included in the block according to the Merkle proof";
+#[error]
+const EInvalidStartHeight: vector<u8> = b"The start height must be a multiple of the retarget period (e.g 2016 for mainnet)";
 
 public struct NewLightClientEvent has copy, drop {
     light_client_id: ID
@@ -102,6 +104,7 @@ public(package) fun new_light_client_with_params_int(params: Params, start_heigh
 /// Encode header reference:
 /// https://developer.bitcoin.org/reference/block_chain.html#block-headers
 public fun new_light_client_with_params(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, ctx: &mut TxContext) {
+    assert!(params.is_correct_init_height(start_height), EInvalidStartHeight);
     let lc = new_light_client_with_params_int(
             params,
             start_height,
