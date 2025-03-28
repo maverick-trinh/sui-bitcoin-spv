@@ -312,10 +312,10 @@ public fun finalized_height(lc: &LightClient): u64 {
 /// * `proof`: merkle tree proof, this is the vector of 32bytes
 /// * `tx_index`: index of transaction in block
 /// * `version`: version of transaction - 4 bytes.
-/// * `input_count`: number input in transaction
-/// * `inputs`: inputs encoded in bytes.
-/// * `output_count`: number output in transaction
-/// * `outputs`: outputs encode in transaction
+/// * `input_count`: number of input objects
+/// * `inputs`: all tx inputs encoded as a single list of bytes.
+/// * `output_count`: number of output objects
+/// * `outputs`: all tx outputs encoded as a single list of bytes.
 /// * `lock_time`: 4 bytes, lock time field in transaction
 /// @return address and amount for each output
 public fun verify_output(
@@ -324,9 +324,9 @@ public fun verify_output(
     proof: vector<vector<u8>>,
     tx_index: u64,
     version: vector<u8>,
-    input_count: u256,
+    input_count: u32,
     inputs: vector<u8>,
-    output_count: u256,
+    output_count: u32,
     outputs: vector<u8>,
     lock_time: vector<u8>
 ): (vector<vector<u8>>, vector<u256>) {
