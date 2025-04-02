@@ -1,7 +1,7 @@
 #[test_only]
 module bitcoin_spv::light_client_tests;
 
-use bitcoin_spv::light_client::{insert_header, new_light_client_with_params_without_share, new_light_client_with_params, LightClient, EWrongParentBlock, EDifficultyNotMatch, ETimeTooOld, EInvalidStartHeight};
+use bitcoin_spv::light_client::{insert_header, new_light_client, init_light_client, LightClient, EWrongParentBlock, EDifficultyNotMatch, ETimeTooOld, EInvalidStartHeight};
 use bitcoin_spv::light_block::new_light_block;
 use bitcoin_spv::block_header::new_block_header;
 use bitcoin_spv::params;
@@ -25,13 +25,13 @@ fun new_lc_for_test(ctx: &mut TxContext) : LightClient {
         x"00800120451bed6d330bd942a708b0858fdbb7d265e5b7caa3c00000000000000000000025ba876f2efbd1522e36a7cd807879eeec843f95da8a01993556100e3226900b8d30cf66763d0317bd91acc5",
         x"0060b0329fd61df7a284ba2f7debbfaef9c5152271ef8165037300000000000000000000562139850fcfc2eb3204b1e790005aaba44e63a2633252fdbced58d2a9a87e2cdb34cf665b250317245ddc6a"
     ];
-    let lc = new_light_client_with_params_without_share(params::mainnet(), start_block, headers, 0, 8, ctx);
+    let lc = new_light_client(params::mainnet(), start_block, headers, 0, 8, ctx);
     return lc
 }
 
 #[test]
 #[expected_failure(abort_code = EInvalidStartHeight)]
-fun test_new_light_client_with_params_wrong_start_height() {
+fun test_init_light_client_wrong_start_height() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let ctx = scenario.ctx();
@@ -39,12 +39,12 @@ fun test_new_light_client_with_params_wrong_start_height() {
         x"00a0b434e99097082da749068bd8cc81f7ddd017f3153e1f25b000000000000000000000fbef99870f826601fed79703773deb9122f03b5167c0b7554c00112f9fa99e171320cf66763d03175c560dcc",
         x"00205223ce8791e22d0a1b64cfb0b485af2ddba566cb54292e0c030000000000000000003f5d648740a3a0519c56fce7f230d4c35aa83c9df0478b77be3fc89f0acfb8cc9524cf66763d03171746f213"
     ];
-    new_light_client_with_params(params::mainnet(), 2, headers, 8, ctx);
+    init_light_client(params::mainnet(), 2, headers, 8, ctx);
     scenario.end();
 }
 
 #[test]
-fun test_new_light_client_with_params() {
+fun test_init_light_client() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let ctx = scenario.ctx();
@@ -52,7 +52,7 @@ fun test_new_light_client_with_params() {
         x"00a0b434e99097082da749068bd8cc81f7ddd017f3153e1f25b000000000000000000000fbef99870f826601fed79703773deb9122f03b5167c0b7554c00112f9fa99e171320cf66763d03175c560dcc",
         x"00205223ce8791e22d0a1b64cfb0b485af2ddba566cb54292e0c030000000000000000003f5d648740a3a0519c56fce7f230d4c35aa83c9df0478b77be3fc89f0acfb8cc9524cf66763d03171746f213"
     ];
-    new_light_client_with_params(params::mainnet(), 2016, headers, 8, ctx);
+    init_light_client(params::mainnet(), 2016, headers, 8, ctx);
     scenario.end();
 }
 

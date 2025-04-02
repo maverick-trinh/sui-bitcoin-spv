@@ -47,7 +47,7 @@ sui client object $LC_ID
 Create a new light client by doing the function call:
 
 ```sh
-sui client call --function new_light_client --module light_client --package $PACKAGE_ID --gas-budget 100000000 --args $BTC_NETWORK 0 $INIT_HEADERS 0
+sui client call --function init_light_client_network --module light_client --package $PACKAGE_ID --gas-budget 100000000 --args $BTC_NETWORK 0 $INIT_HEADERS 0
 ```
 
 `BTC_NETWORK` is 0 for mainnet, 1 for testnet and regtest otherwise.

@@ -63,8 +63,9 @@ fun init(_ctx: &mut TxContext) {
     // LC creation is permissionless and it's done through new new_btc_light_client.
 }
 
-/// function to create a light client
-public fun new_light_client_with_params_without_share(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, finality: u64, ctx: &mut TxContext): LightClient {
+/// LightClient constructor. Use `init_light_client` to create and transfer object,
+/// emitting an event.
+public fun new_light_client(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, finality: u64, ctx: &mut TxContext): LightClient {
     let mut lc = LightClient {
         id: object::new(ctx),
         params: params,
@@ -96,16 +97,16 @@ public fun new_light_client_with_params_without_share(params: Params, start_heig
 
 
 /// Initializes Bitcoin light client by providing a trusted snapshot height and header
-/// params: Mainnet, Testnet or Regtest
+/// params: Mainnet, Testnet or Regtest.
 /// start_height: the height of first trust block
 /// trusted_header: The list of trusted header in hex encode.
 /// strart_chain_work: the chain_work at first trusted block.
 ///
-/// Encode header reference:
+/// Header serialization reference:
 /// https://developer.bitcoin.org/reference/block_chain.html#block-headers
-public fun new_light_client_with_params(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, ctx: &mut TxContext) {
+public fun init_light_client(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, ctx: &mut TxContext) {
     assert!(params.is_correct_init_height(start_height), EInvalidStartHeight);
-    let lc = new_light_client_with_params_without_share(
+    let lc = new_light_client(
             params,
             start_height,
             trusted_headers,
@@ -121,7 +122,7 @@ public fun new_light_client_with_params(params: Params, start_height: u64, trust
 
 /// Helper function to initialize new light client.
 /// network: 0 = mainnet, 1 = testnet
-public fun new_light_client(
+public fun init_light_client_network(
     network: u8, start_height: u64, start_headers: vector<vector<u8>>, start_chain_work: u256, ctx: &mut TxContext
 )  {
     let params = match (network) {
@@ -129,7 +130,7 @@ public fun new_light_client(
         1 => params::testnet(),
         _ => params::regtest()
     };
-    new_light_client_with_params(params, start_height, start_headers, start_chain_work, ctx);
+    init_light_client(params, start_height, start_headers, start_chain_work, ctx);
 }
 
 
@@ -138,7 +139,10 @@ public fun new_light_client(
  * Entry methods
  */
 
-
+/// Insert new headers to extend the LC chain. Fails if the included headers don't
+/// create a heavier chain or fork.
+/// Header serialization reference:
+/// https://developer.bitcoin.org/reference/block_chain.html#block-headers
 public entry fun insert_headers(lc: &mut LightClient, raw_headers: vector<vector<u8>>) {
     // TODO: check if we can use BlockHeader instead of raw_header or vector<u8>(bytes)
     assert!(!raw_headers.is_empty(), EHeaderListIsEmpty);
