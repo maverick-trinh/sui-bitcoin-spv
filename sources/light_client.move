@@ -5,7 +5,7 @@ use bitcoin_spv::light_block::{LightBlock, new_light_block};
 use bitcoin_spv::merkle_tree::verify_merkle_proof;
 use bitcoin_spv::btc_math::target_to_bits;
 use bitcoin_spv::utils::nth_element;
-use bitcoin_spv::transaction::make_transaction;
+use bitcoin_spv::transaction::{make_transaction, Transaction};
 use bitcoin_spv::params::{Params, Self, is_correct_init_height};
 
 
@@ -63,8 +63,8 @@ fun init(_ctx: &mut TxContext) {
     // LC creation is permissionless and it's done through new new_btc_light_client.
 }
 
-/// internal funciton to create a light client
-public(package) fun new_light_client_with_params_int(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, finality: u64, ctx: &mut TxContext): LightClient {
+/// function to create a light client
+public fun new_light_client_with_params_without_share(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, finality: u64, ctx: &mut TxContext): LightClient {
     let mut lc = LightClient {
         id: object::new(ctx),
         params: params,
@@ -105,12 +105,12 @@ public(package) fun new_light_client_with_params_int(params: Params, start_heigh
 /// https://developer.bitcoin.org/reference/block_chain.html#block-headers
 public fun new_light_client_with_params(params: Params, start_height: u64, trusted_headers: vector<vector<u8>>, start_chain_work: u256, ctx: &mut TxContext) {
     assert!(params.is_correct_init_height(start_height), EInvalidStartHeight);
-    let lc = new_light_client_with_params_int(
+    let lc = new_light_client_with_params_without_share(
             params,
             start_height,
             trusted_headers,
-            start_chain_work, 
-            8, 
+            start_chain_work,
+            8,
             ctx
         );
     event::emit(NewLightClientEvent {
@@ -190,7 +190,6 @@ public entry fun insert_headers(lc: &mut LightClient, raw_headers: vector<vector
         head_height: lc.head_height,
     });
 }
-
 
 public(package) fun insert_light_block(lc: &mut LightClient, lb: LightBlock) {
     let block_hash = lb.header().block_hash();
@@ -522,4 +521,48 @@ public fun retarget_algorithm(p: &Params, previous_target: u256, first_timestamp
     };
 
     next_target
+}
+
+
+/// Verifies the transaction and parses outputs to calculates the payment to the receiver.
+/// To if you only want to verify if the tx is included in the block, you can use
+/// `verify_tx` function.
+/// Returns the the total amount of satoshi send to `receiver_address` from transaction outputs,
+/// the content of the `OP_RETURN` opcode output, and tx_id (hash).
+/// If OP_RETURN is not included in the transaction, return an empty vector.
+/// NOTE: output with OP_RETURN is invalid, and only one such output can be included in a TX.
+/// * `height`: block height the transaction belongs to.
+/// * `proof`: merkle tree proof, this is the vector of 32bytes.
+/// * `tx_index`: index of transaction in block.
+/// * `transaction`: bitcoin transaction. Check transaction.move.
+/// * `receiver_address`: address of receiver in p2pkh or p2wpkh.
+public fun verify_payment(
+    lc: &LightClient,
+    height: u64,
+    proof: vector<vector<u8>>,
+    tx_index: u64,
+    transaction: &Transaction,
+    receiver_address: vector<u8>
+) : (u256, vector<u8>, vector<u8>) {
+    let mut amount = 0;
+    let mut op_return_msg = vector[];
+    let tx_id = transaction.tx_id();
+    assert!(lc.verify_tx(height, tx_id, proof, tx_index), ETxNotInBlock);
+    let outputs = transaction.outputs();
+
+    let mut i = 0;
+    while (i < outputs.length()) {
+        let o = outputs[i];
+        if (o.is_pk_hash_script() && o.p2pkh_address() == receiver_address) {
+            amount = amount + o.amount();
+        };
+
+        if (o.is_op_return()) {
+            op_return_msg = o.op_return();
+        };
+
+        i = i + 1;
+    };
+
+    (amount, op_return_msg, tx_id)
 }
