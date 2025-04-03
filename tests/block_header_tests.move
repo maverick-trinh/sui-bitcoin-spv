@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 #[test_only]
 module bitcoin_spv::block_header_tests;
 use bitcoin_spv::block_header::{new_block_header, EPoW, EInvalidBlockHeaderSize};

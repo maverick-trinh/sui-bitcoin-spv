@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 module bitcoin_spv::block_header;
 
 use bitcoin_spv::btc_math::{btc_hash, to_u32, bits_to_target, to_u256};

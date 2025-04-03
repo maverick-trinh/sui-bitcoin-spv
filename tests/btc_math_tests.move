@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 #[test_only]
 module bitcoin_spv::btc_math_tests;
 use bitcoin_spv::btc_math::{target_to_bits, bits_to_target, compact_size, Self};

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 module bitcoin_spv::merkle_tree;
 
 use bitcoin_spv::btc_math::btc_hash;

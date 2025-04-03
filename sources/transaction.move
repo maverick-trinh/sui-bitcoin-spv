@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 module bitcoin_spv::transaction;
 use bitcoin_spv::btc_math::{btc_hash, u256_to_compact, to_number, compact_size};
 use bitcoin_spv::utils::slice;

@@ -1,12 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+
 import hashlib
 import json
+
 
 def double_sha256(data):
     data_bytes = bytes.fromhex(data)
     return hashlib.sha256(hashlib.sha256(data_bytes).digest()).hexdigest()
 
+
 def merkle_root(hashes):
-    """ Computes the Merkle root from a list of hashes using double SHA-256. """
+    """Computes the Merkle root from a list of hashes using double SHA-256."""
     if len(hashes) == 1:
         return hashes[0]
 
@@ -22,8 +26,9 @@ def merkle_root(hashes):
 
     return merkle_root(new_hashes)
 
+
 def merkle_proof(transaction_hash, all_hashes):
-    """ Computes the Merkle proof for a specific transaction hash. """
+    """Computes the Merkle proof for a specific transaction hash."""
     proof = []
 
     # Find the position of the transaction in the list of all hashes
@@ -44,14 +49,16 @@ def merkle_proof(transaction_hash, all_hashes):
             all_hashes.append(all_hashes[-1])
 
         # Pair up the hashes and hash them again
-        all_hashes = [double_sha256(all_hashes[i] + all_hashes[i + 1]) for i in range(0, len(all_hashes), 2)]
+        all_hashes = [
+            double_sha256(all_hashes[i] + all_hashes[i + 1])
+            for i in range(0, len(all_hashes), 2)
+        ]
         index = index // 2  # Move up one level in the tree
 
     return proof
 
+
 # Example transaction hashes (replace with actual transaction hashes)
-
-
 
 
 def big_endian_to_little_endian(hex_str):
@@ -61,22 +68,25 @@ def big_endian_to_little_endian(hex_str):
         raise ValueError("Hex string must have an even length.")
 
     # Reverse the order of bytes (pair of hex characters)
-    little_endian = ''.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)][::-1])
+    little_endian = "".join(
+        [hex_str[i : i + 2] for i in range(0, len(hex_str), 2)][::-1]
+    )
 
     return little_endian
 
 
-
 def main():
-    with open('0000000000000000006a446097f7b1eb970ac12dee4e5ced95ad1a3f38a67a46.txt') as file:
-            data = json.load(file)
-    tx_hashes =  data["tx"]
+    with open(
+        "0000000000000000006a446097f7b1eb970ac12dee4e5ced95ad1a3f38a67a46.txt"
+    ) as file:
+        data = json.load(file)
+    tx_hashes = data["tx"]
     tx_hashes = list(map(big_endian_to_little_endian, tx_hashes))
     # Compute Merkle root
     merkle_root_hash = merkle_root(tx_hashes)
-    print(f'Merkle root: {merkle_root_hash}')
+    print(f"Merkle root: {merkle_root_hash}")
 
-    tx_hash = tx_hashes[604];
+    tx_hash = tx_hashes[604]
     proof = merkle_proof(tx_hash, tx_hashes)
     # print(f"Merkle Proof for {tx_hash}: {proof}")
 
@@ -84,6 +94,5 @@ def main():
     print(f"Merkle Proof for {tx_hash}: [{', '.join(proof_with_prefix)}]")
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

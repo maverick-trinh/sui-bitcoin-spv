@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 module bitcoin_spv::light_block;
 
 use bitcoin_spv::block_header::BlockHeader;

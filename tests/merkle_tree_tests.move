@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MPL-2.0
+
 module bitcoin_spv::merkle_tree_tests;
 
 use bitcoin_spv::merkle_tree::verify_merkle_proof;
