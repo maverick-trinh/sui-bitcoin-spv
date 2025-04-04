@@ -28,7 +28,7 @@ const EBlockNotFound: vector<u8> = b"The specified block could not be found in t
 #[error]
 const EForkChainWorkTooSmall: vector<u8> = b"The proposed fork has less work than the current chain";
 #[error]
-const ETxNotInBlock: vector<u8> = b"The transaction is not included in the block according to the Merkle proof";
+const ETxNotInBlock: vector<u8> = b"The transaction is not included in a finalized block according to the Merkle proof";
 #[error]
 const EInvalidStartHeight: vector<u8> = b"The start height must be a multiple of the retarget period (e.g 2016 for mainnet)";
 
@@ -166,7 +166,7 @@ public entry fun insert_headers(lc: &mut LightClient, raw_headers: vector<vector
         // We decide to not to do it to protect from deadlock:
         // * pro: we protect against double mint for nBTC etc...
         // * cons: we can have a deadlock
-        if (lc.head_height - parent.height() > lc.finality) {
+        if (parent.height() >= lc.finalized_height()) {
             event::emit(ForkBeyondFinality{
                 parent_hash: parent_id,
                 parent_height: parent.height(),
@@ -366,8 +366,10 @@ public fun verify_tx(
     proof: vector<vector<u8>>,
     tx_index: u64
 ): bool {
-    // TODO: update this when we have APIs for finalized block.
     // TODO: handle: light block/block_header not exist.
+    if (height > lc.finalized_height()) {
+        return false
+    };
     let block_hash = lc.get_block_hash_by_height(height);
     let header = lc.get_light_block_by_hash(block_hash).header();
     let merkle_root = header.merkle_root();
