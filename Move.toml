@@ -1,8 +1,8 @@
 [package]
 name = "BitcoinSPV"
-edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
+edition = "2024.beta"
 license = "MPL-2.0"
-authors = ["Native"]   # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
+authors = ["Native"]
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
