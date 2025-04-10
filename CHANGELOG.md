@@ -12,7 +12,7 @@ Usage:
 
 Change log entries are to be added to the Unreleased section and in one of the following subsections: Features, Breaking Changes, Bug Fixes. Example entry:
 
-* [#<PR-number>](https://github.com/gonative-cc/relayer/pull/<PR-number>) <description>
+* [#<PR-number>](https://github.com/gonative-cc/move-bitcoin-spv/pull/<PR-number>) <description>
 -->
 
 # CHANGELOG
@@ -21,10 +21,15 @@ Change log entries are to be added to the Unreleased section and in one of the f
 
 ### Features
 
-
 ### Breaking Changes
 
 ### Bug Fixes
+
+## v0.3.1 (2024-04-10)
+
+### Bug Fixes
+
+- [#78](https://github.com/gonative-cc/move-bitcoin-spv/pull/78) fix: parse P2WPHK output
 
 ## v0.3.0 (2024-04-04)
 
