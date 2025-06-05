@@ -45,9 +45,8 @@ test:
 	@sui move test
 
 test-coverage:
-	echo TODO
-# sui move test --coverage
-# sui move coverage
+	@sui move test --coverage
+	@sui move coverage summary --test
 
 # Variables for build output and module name
 BUILD_DIR := build
