@@ -12,7 +12,7 @@ publish:
 
 # used as pre-commit
 lint-git:
-	@git diff --name-only --cached | grep  -E '\.md$$' | xargs -r markdownlint-cli2
+	@git diff --name-only --cached | grep  -E '\.md$$'| grep -v '^docs/' | xargs -r markdownlint-cli2
 	@sui move build --lint
 # lint changed files
 lint:
@@ -49,7 +49,16 @@ test-coverage:
 # sui move test --coverage
 # sui move coverage
 
-.PHONY: test test-coverage
+# Variables for build output and module name
+BUILD_DIR := build
+MODULE_NAME := BitcoinSPV
+DOCS_SUBDIR := bitcoin_spv
+
+gen-docs:
+	@sui move build --doc
+	@cp -r ./$(BUILD_DIR)/$(MODULE_NAME)/docs/$(DOCS_SUBDIR) ./docs
+
+.PHONY: test test-coverage gen-docs
 
 ###############################################################################
 ##                                Infrastructure                             ##
