@@ -209,9 +209,7 @@ fun bytes_of_test() {
 fun get_last_32_bits_test() {
     assert_eq!(get_last_32_bits(0), 0);
     assert_eq!(
-        get_last_32_bits(
-            0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-        ),
+        get_last_32_bits(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff),
         0xffffffff,
     );
     assert_eq!(get_last_32_bits(0x0123456789), 0x23456789);

@@ -103,10 +103,7 @@ fun test_difficulty_computation_mainnet() {
     lc.set_block_hash_by_height(first_block.height(), first_block.header().block_hash());
     lc.append_block(first_block);
 
-    let new_bits = calc_next_required_difficulty(
-        &lc,
-        lc.get_light_block_by_hash(last_block_hash),
-    );
+    let new_bits = calc_next_required_difficulty(&lc, lc.get_light_block_by_hash(last_block_hash));
 
     // 0x1703098c is bits of block 860832
     assert!(new_bits == 0x1703098c);

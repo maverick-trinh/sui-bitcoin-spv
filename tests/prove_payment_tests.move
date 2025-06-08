@@ -23,14 +23,7 @@ fun test_verify_payment() {
 
     let ctx = scenario.ctx();
     let finality = 4; // => the block 325001 is finally in this case
-    let lc = new_light_client(
-        params::mainnet(),
-        start_block_height,
-        headers,
-        0,
-        finality,
-        ctx,
-    );
+    let lc = new_light_client(params::mainnet(), start_block_height, headers, 0, finality, ctx);
 
     // merkle proof of transaction id gen by proof.py in scripts folder.
     let proof = vector[
@@ -86,14 +79,7 @@ fun test_verify_payment_with_P2WPHK_output() {
 
     let ctx = scenario.ctx();
     let finality = 0;
-    let lc = new_light_client(
-        params::mainnet(),
-        start_block_height,
-        headers,
-        0,
-        finality,
-        ctx,
-    );
+    let lc = new_light_client(params::mainnet(), start_block_height, headers, 0, finality, ctx);
 
     // empty because only one transaction
     let proof = vector[];
