@@ -36,6 +36,7 @@ public fun to_u256(v: vector<u8>): u256 {
     assert!(v.length() == 32, EInvalidLength);
     let mut ans = 0u256;
     let mut i = 0;
+
     while (i < 32) {
         ans = ans +  ((v[i] as u256)  << (i * 8 as u8));
         i = i + 1;

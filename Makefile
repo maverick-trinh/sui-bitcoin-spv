@@ -1,6 +1,8 @@
 
+
 setup-hooks:
 	@cd .git/hooks; ln -s -f ../../scripts/git-hooks/* ./
+	@npm install -g prettier @mysten/prettier-plugin-move
 
 .git/hooks/pre-commit: setup
 
@@ -48,6 +50,12 @@ test-coverage:
 	@sui move test --coverage
 	@sui move coverage summary --test
 
+
+.PHONY: test test-coverage
+
+###############################################################################
+##                                   Docs                                    ##
+###############################################################################
 # Variables for build output and module name
 BUILD_DIR := build
 MODULE_NAME := BitcoinSPV
@@ -57,7 +65,7 @@ gen-docs:
 	@sui move build --doc
 	@cp -r ./$(BUILD_DIR)/$(MODULE_NAME)/docs/$(DOCS_SUBDIR) ./docs
 
-.PHONY: test test-coverage gen-docs
+.PHONY: gen-docs
 
 ###############################################################################
 ##                                Infrastructure                             ##
