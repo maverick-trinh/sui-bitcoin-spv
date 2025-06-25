@@ -11,6 +11,7 @@ use bitcoin_spv::light_client::{
     EBlockNotFound
 };
 use bitcoin_spv::params;
+use std::unit_test::assert_eq;
 use sui::test_scenario;
 
 // Test for fork handle
@@ -93,21 +94,20 @@ fun insert_headers_switch_fork_tests() {
     headers.do!(|h| {
         let inserted_block_hash = lc.get_block_hash_by_height(insert_point);
         let inserted_block = lc.get_light_block_by_hash(inserted_block_hash);
-        assert!(inserted_block_hash == new_block_header(h).block_hash());
-        assert!(inserted_block.height() == insert_point);
-        assert!(inserted_block.header().block_hash() == inserted_block_hash);
+        assert_eq!(inserted_block_hash, new_block_header(h).block_hash());
+        assert_eq!(inserted_block.height(), insert_point);
+        assert_eq!(inserted_block.header().block_hash(), inserted_block_hash);
         insert_point = insert_point + 1;
     });
 
-    assert!(lc.head().height() == insert_point - 1);
-    assert!(lc.head().header() == last_header);
+    assert_eq!(lc.head().height(), insert_point - 1);
+    assert_eq!(*lc.head().header(), last_header);
     sui::test_utils::destroy(lc);
     scenario.end();
 }
 
-#[test]
-#[expected_failure(abort_code = EForkChainWorkTooSmall)]
-fun insert_headers_fork_not_enought_power_tests() {
+#[test, expected_failure(abort_code = EForkChainWorkTooSmall)]
+fun insert_headers_fork_not_enought_power_should_fail() {
     let headers = vector[
         // fork starts here
         // but not enough chain power
@@ -138,9 +138,8 @@ fun insert_headers_fork_not_enought_power_tests() {
     scenario.end();
 }
 
-#[test]
-#[expected_failure(abort_code = EBlockNotFound)]
-fun insert_headers_block_doesnot_exist() {
+#[test, expected_failure(abort_code = EBlockNotFound)]
+fun insert_headers_block_does_not_exist_should_fail() {
     // we modifed the previous hash
     // previous hash = db0338a432b1242c3bd22c245583e31788feaa6cb189673877b92f2a34eaf460 = sha256("This is null")
     let headers = vector[
@@ -156,7 +155,7 @@ fun insert_headers_block_doesnot_exist() {
 }
 
 #[test]
-fun cleanup_tests() {
+fun cleanup_happy_cases() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let ctx = scenario.ctx();
@@ -171,9 +170,9 @@ fun cleanup_tests() {
 
     while (i < headers.length()) {
         if (i <= height) {
-            assert!(lc.exist(headers[i].block_hash()));
+            assert_eq!(lc.exist(headers[i].block_hash()), true);
         } else {
-            assert!(!lc.exist(headers[i].block_hash()));
+            assert_eq!(lc.exist(headers[i].block_hash()), false);
         };
         i = i + 1;
     };
@@ -183,7 +182,7 @@ fun cleanup_tests() {
 }
 
 #[test]
-fun test_reorg() {
+fun reorg_happy_case() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let ctx = scenario.ctx();
@@ -252,8 +251,11 @@ fun test_reorg() {
     // validate new chain after update
     let head = lc.head();
     // new chain head should identical last header in `forks`.
-    assert!(head.header().block_hash() == new_block_header(forks[forks.length() - 1]).block_hash());
-    assert!(head.chain_work() == 42);
+    assert_eq!(
+        head.header().block_hash(),
+        new_block_header(forks[forks.length() - 1]).block_hash(),
+    );
+    assert_eq!(head.chain_work(), 42);
 
     sui::test_utils::destroy(lc);
     scenario.end();

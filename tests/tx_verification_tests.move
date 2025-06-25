@@ -5,6 +5,7 @@ module bitcoin_spv::tx_verification_tests;
 
 use bitcoin_spv::light_client::{new_light_client, LightClient};
 use bitcoin_spv::params;
+use std::unit_test::assert_eq;
 use sui::test_scenario;
 
 #[test_only]
@@ -18,8 +19,7 @@ fun new_lc_for_test(ctx: &mut TxContext): LightClient {
         x"006000268138f1b23ce293b438ce2f6ba73658fbddef5607ce3e01000000000000000000468b267b782a9bf25b419bf3035cb177a98c75dd0b961bce3036e822d0fa0ce88337cf665b250317b0f11b99",
     ];
     // finality = 4 => first block is finalized.
-    let lc = new_light_client(params::mainnet(), start_block, headers, 0, 4, ctx);
-    return lc
+    new_light_client(params::mainnet(), start_block, headers, 0, 4, ctx)
 }
 
 #[test_only]
@@ -47,34 +47,34 @@ fun sample_data(): (u64, vector<u8>, vector<vector<u8>>, u64) {
 }
 
 #[test]
-fun test_verify_tx() {
+fun verify_tx_happy_cases() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let lc = new_lc_for_test(scenario.ctx());
 
     let (height, tx_id, proof, tx_index) = sample_data();
     let res = lc.verify_tx(height, tx_id, proof, tx_index);
-    assert!(res == true);
+    assert_eq!(res, true);
 
     let (height, tx_id, proof, _) = sample_data();
     let tx_index = 100;
     let res = lc.verify_tx(height, tx_id, proof, tx_index);
-    assert!(res == false);
+    assert_eq!(res, false);
 
     let (height, _, proof, tx_index) = sample_data();
     let tx_id = x"010203";
     let res = lc.verify_tx(height, tx_id, proof, tx_index);
-    assert!(res == false);
+    assert_eq!(res, false);
 
     let (height, tx_id, _, tx_index) = sample_data();
     let proof = vector[];
     let res = lc.verify_tx(height, tx_id, proof, tx_index);
-    assert!(res == false);
+    assert_eq!(res, false);
 
     let (_, tx_id, proof, tx_index) = sample_data();
     let height = 858817; // this block not finalize yet.
     let res = lc.verify_tx(height, tx_id, proof, tx_index);
-    assert!(res == false);
+    assert_eq!(res, false);
 
     sui::test_utils::destroy(lc);
     scenario.end();

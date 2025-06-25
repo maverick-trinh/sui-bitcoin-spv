@@ -6,10 +6,11 @@ module bitcoin_spv::verify_payment_tests;
 use bitcoin_spv::light_client::{new_light_client, ETxNotInBlock};
 use bitcoin_spv::params;
 use bitcoin_spv::transaction::make_transaction;
+use std::unit_test::assert_eq;
 use sui::test_scenario;
 
 #[test]
-fun test_verify_payment() {
+fun verify_payment_happy_cases() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let start_block_height = 325001;
@@ -60,15 +61,15 @@ fun test_verify_payment() {
         x"e6228f7a5ee6b15c7cccfd9f9cb7e86992610845",
     );
 
-    assert!(tx_id == x"754e4a84a89272e24d8968a37222648ced57d533e4d8cf2b24980658dd16fb6d");
-    assert!(amount == 412133);
-    assert!(message == x"68656c6c6f20776f726c64");
+    assert_eq!(tx_id, x"754e4a84a89272e24d8968a37222648ced57d533e4d8cf2b24980658dd16fb6d");
+    assert_eq!(amount, 412133);
+    assert_eq!(message, x"68656c6c6f20776f726c64");
     sui::test_utils::destroy(lc);
     scenario.end();
 }
 
 #[test]
-fun test_verify_payment_with_P2WPHK_output() {
+fun verify_payment_with_P2WPHK_output_happy_cases() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let start_block_height = 0;
@@ -104,16 +105,15 @@ fun test_verify_payment_with_P2WPHK_output() {
         x"e6228f7a5ee6b15c7cccfd9f9cb7e86992610845",
     );
 
-    assert!(tx_id == x"df88e4ad22477438db0a80979cf3dea033aa968c97fe06270f8864941a30649b");
-    assert!(amount == 412133);
-    assert!(message == x"68656c6c6f20776f726c64");
+    assert_eq!(tx_id, x"df88e4ad22477438db0a80979cf3dea033aa968c97fe06270f8864941a30649b");
+    assert_eq!(amount, 412133);
+    assert_eq!(message, x"68656c6c6f20776f726c64");
     sui::test_utils::destroy(lc);
     scenario.end();
 }
 
-#[test]
-#[expected_failure(abort_code = ETxNotInBlock)]
-fun test_verify_payment_fails() {
+#[test, expected_failure(abort_code = ETxNotInBlock)]
+fun verify_payment_for_tx_not_in_block_shoul_fail() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let start_block_height = 325001;
@@ -164,9 +164,8 @@ fun test_verify_payment_fails() {
     scenario.end();
 }
 
-#[test]
-#[expected_failure(abort_code = ETxNotInBlock)]
-fun test_verify_payment_block_not_finalize() {
+#[test, expected_failure(abort_code = ETxNotInBlock)]
+fun verify_payment_on_block_not_finalize_should_fail() {
     let sender = @0x01;
     let mut scenario = test_scenario::begin(sender);
     let start_block_height = 325001;
