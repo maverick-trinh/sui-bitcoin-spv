@@ -7,8 +7,8 @@ use bitcoin_spv::btc_math::target_to_bits;
 use bitcoin_spv::light_block::{LightBlock, new_light_block};
 use bitcoin_spv::merkle_tree::verify_merkle_proof;
 use bitcoin_spv::params::{Self, Params, is_correct_init_height};
-use bitcoin_spv::transaction::Transaction;
 use bitcoin_spv::utils::nth_element;
+use btc_parser::tx::Transaction;
 use sui::dynamic_field as df;
 use sui::event;
 
