@@ -11,26 +11,14 @@ insert_final_newline = true
 [*.{js,cjs,ts}]
 indent_style = tab
 indent_size = 4
-max_line_length = 96
-
-[*.{jsx,tsx}]
-indent_style = tab
-indent_size = 4
-max_line_length = 110
+max_line_length = 100
 
 [*.json]
 indent_style = tab
 indent_size = 4
 
-[*.go]
-max_line_length = 96
-indent_style = tab
-
 [*.move]
-max_line_length = 96
-
-[*.sql]
-indent_style = tab
+max_line_length = 100
 
 [*.{md,rst}]
 trim_trailing_whitespace = false

@@ -16,6 +16,8 @@ publish:
 lint-git:
 	@git diff --name-only --cached | grep  -E '\.md$$'| grep -v '^docs/' | xargs -r markdownlint-cli2
 	@sui move build --lint
+# note: prettier-move is run in the hook directly
+
 # lint changed files
 lint:
 	@git diff --name-only | grep  -E '\.md$$' | xargs -r markdownlint-cli2
@@ -30,7 +32,7 @@ lint-fix-all:
 	@echo "Sui move lint will be fixed by manual"
 
 .PHONY: build setup
-.PHONY: lint lint-all lint-fix-all
+.PHONY: lint-git lint lint-all lint-fix-all
 
 
 # add license header to every source file
